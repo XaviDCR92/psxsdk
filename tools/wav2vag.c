@@ -1,9 +1,9 @@
 /*
  * wav2vag
- * 
+ *
  * Converts a WAV file to a PlayStation VAG file.
  * Based on PSX VAG-Packer 0.1 by bITmASTER.
- *       
+ *
  */
 
 #include <stdio.h>
@@ -31,7 +31,7 @@ int main( int argc, char *argv[] )
     int shift_factor;
     int flags;
     int size;
-    int i, j, k;    
+    int i, j, k;
     unsigned char d;
     char s[4];
     int chunk_data;
@@ -43,7 +43,7 @@ int main( int argc, char *argv[] )
 	int sraw = 0;
     short sample_size;
     unsigned char c;
-	
+
     if (argc < 3)
     {
         printf("wav2vag - Convert a WAV file to a PlayStation VAG sound file\n");
@@ -63,30 +63,30 @@ int main( int argc, char *argv[] )
 	printf("This utility is based on PSX VAG-Packer by bITmASTER\n");
         return -1;
     }
-    
+
     for(i = 0; i < sizeof(internal_name); i++)
 	internal_name[i] = 0;
-    
+
     strcpy(internal_name, "PSXSDK");
-	
+
     fp = fopen(argv[1], "rb");
     if (fp == NULL)
     {
-        printf("Can´t open %s. Aborting.\n", argv[1]);
+        printf("Can't open %s. Aborting.\n", argv[1]);
         return -2;
     }
-    
+
     for(i = 3; i < argc; i++)
 	{
 		if(strcmp(argv[i], "-L") == 0)
 			enable_looping = 1;
-		
+
 		if(strncmp(argv[i], "-name=",6) == 0)
 			strncpy(internal_name, argv[i]+6, 15);
-		
+
 		if(strcmp(argv[i], "-raw") == 0)
 			raw_output = 1;
-		
+
 		if(strcmp(argv[i], "-sraw8") == 0)
 		{
 			fseek(fp, 0, SEEK_END);
@@ -96,7 +96,7 @@ int main( int argc, char *argv[] )
 			sample_freq = 44010;
 			sraw = 1;
 		}
-		
+
 		if(strcmp(argv[i], "-sraw16") == 0)
 		{
 			fseek(fp, 0, SEEK_END);
@@ -106,13 +106,13 @@ int main( int argc, char *argv[] )
 			sample_freq = 44010;
 			sraw = 1;
 		}
-		
+
 		if(strncmp(argv[i], "-freq=", 6) == 0)
 		{
 			sscanf(argv[i], "-freq=%d", &sample_freq);
 		}
 	}
-    
+
 
     if(sraw == 1)
 	    goto convert_to_vag;
@@ -126,7 +126,7 @@ int main( int argc, char *argv[] )
 
     fseek(fp, 8, SEEK_SET);
     fread(s, 1, 4, fp);
-    
+
     if (strncmp(s, "WAVE", 4))
     {
         printf("%s is not in WAV format\n", argv[1]);
@@ -135,29 +135,29 @@ int main( int argc, char *argv[] )
 
     fseek(fp, 8 + 4, SEEK_SET);
     fread(s, 1, 4, fp);
-    
-    if (strncmp(s, "fmt", 3)) 
+
+    if (strncmp(s, "fmt", 3))
     {
         printf("%s is not in WAV format\n", argv[1]);
         return -3;
     }
-    
-   // fread(&chunk_data, sizeof(int), 1, fp); 
+
+   // fread(&chunk_data, sizeof(int), 1, fp);
     chunk_data = read_le_dword(fp);
     chunk_data += ftell(fp);
-    
+
   //  fread(&e, 2, 1, fp);
      e = read_le_word(fp);
-    
+
     if (e!=1)
     {
         printf("No PCM found in %s. Aborting.\n", argv[1]);
         return -4;
-    }   
+    }
 
 //    fread(&e, 2, 1, fp);
     e = read_le_word(fp);
-    
+
     if (e!=1)
     {
         //printf( "must be MONO\n" );
@@ -170,12 +170,12 @@ int main( int argc, char *argv[] )
     else
 	//fread(&sample_freq, 4, 1, fp);
         sample_freq = read_le_dword(fp);
-    
+
     fseek(fp, 4 + 2, SEEK_CUR);
 
 //    fread(&sample_size, 2, 1, fp);
     sample_size = read_le_word(fp);
-    
+
  /*   if (e!=16)
     {
         //printf( "only 16 bit samples\n" );
@@ -183,11 +183,11 @@ int main( int argc, char *argv[] )
 	       "Aborting.\n");
         return -6;
     }*/
-        
+
     fseek(fp, chunk_data, SEEK_SET);
-    
+
     fread(s, 1, 4, fp);
-    
+
     if (strncmp(s, "data", 4))
     {
         printf("No data chunk in %s. Aborting.\n", argv[1]);
@@ -196,7 +196,7 @@ int main( int argc, char *argv[] )
 
     // fread(&sample_len, 4, 1, fp);
     sample_len = read_le_dword(fp);
-    
+
     if(sample_size == 16)
 	sample_len /= 2;
 
@@ -204,9 +204,9 @@ int main( int argc, char *argv[] )
     p = strrchr( fname, '.' );
     p++;
     strcpy( p, "vag" );*/
-convert_to_vag:    
+convert_to_vag:
     vag = fopen(argv[2], "wb");
-    
+
     if (vag == NULL)
     {
         printf("Can't open output file. Aborting.\n");
@@ -214,20 +214,20 @@ convert_to_vag:
     }
 
 /*	strcpy(internal_name, "PSXSDK");
-	
+
     	for(i = 3; i < argc; i++)
 	{
 		if(strcmp(argv[i], "-L") == 0)
 			enable_looping = 1;
-		
+
 		if(strncmp(argv[i], "-name=",6) == 0)
 			strncpy(internal_name, argv[i]+6, 15);
-		
+
 		if(strcmp(argv[i], "-raw") == 0)
 			raw_output = 1;
 	}
 */
-    
+
 	if(raw_output == 0)
 	{
 		fprintf( vag, "VAGp" );             // ID
@@ -238,24 +238,24 @@ convert_to_vag:
 			size++;
 		fputi( 16 * ( size + 2 ), vag );    // Data size
 		fputi( sample_freq, vag );          // Sampling frequency
-    
+
 		for ( i = 0; i < 12; i++ )          // Reserved
 			fputc( 0, vag );
 
 		fwrite(internal_name, sizeof(char), 16, vag);
-    
+
 		for( i = 0; i < 16; i++ )
 			fputc( 0, vag );                // ???
 	}
-		
+
 	if(enable_looping)
 		flags = 6;
 	else
-		flags = 0;  
-	
+		flags = 0;
+
     while( sample_len > 0 ) {
-        size = ( sample_len >= BUFFER_SIZE ) ? BUFFER_SIZE : sample_len; 
-	    
+        size = ( sample_len >= BUFFER_SIZE ) ? BUFFER_SIZE : sample_len;
+
 	if(sample_size == 8)
 	{
 		for(i = 0; i < size; i++)
@@ -272,14 +272,14 @@ convert_to_vag:
 		for(i = 0; i < size; i++)
 			wave[i] = read_le_word(fp);
 	}
-	
+
         i = size / 28;
         if ( size % 28 ) {
             for ( j = size % 28; j < 28; j++ )
                 wave[28*i+j] = 0;
             i++;
         }
-        
+
         for ( j = 0; j < i; j++ ) {                                     // pack 28 samples
             ptr = wave + j * 28;
             find_predict( ptr, d_samples, &predict_nr, &shift_factor );
@@ -294,25 +294,25 @@ convert_to_vag:
             sample_len -= 28;
             if ( sample_len < 28 && enable_looping == 0)
                 flags = 1;
-	    
+
 	    if(enable_looping)
 		flags = 2;
         }
     }
-    
+
     fputc( ( predict_nr << 4 ) | shift_factor, vag );
-    
+
     if(enable_looping)
 	    fputc(3, vag);
     else
 	fputc( 7, vag );            // end flag
-    
+
     for ( i = 0; i < 14; i++ )
         fputc( 0, vag );
-    
+
     fclose( fp );
-    fclose( vag );  
-//    getch(); 
+    fclose( vag );
+//    getch();
     return( 0 );
 }
 
@@ -322,7 +322,7 @@ static double f[5][2] = { { 0.0, 0.0 },
                             { -115.0 / 64.0, 52.0 / 64.0 },
                             {  -98.0 / 64.0, 55.0 / 64.0 },
                             { -122.0 / 64.0, 60.0 / 64.0 } };
-                  
+
 
 
 void find_predict( short *samples, double *d_samples, int *predict_nr, int *shift_factor )
@@ -356,7 +356,7 @@ void find_predict( short *samples, double *d_samples, int *predict_nr, int *shif
                 s_2 = s_1;                                  // new s[t-2]
                 s_1 = s_0;                                  // new s[t-1]
         }
-        
+
         if ( max[i] < min ) {
             min = max[i];
             *predict_nr = i;
@@ -365,7 +365,7 @@ void find_predict( short *samples, double *d_samples, int *predict_nr, int *shif
             *predict_nr = 0;
             break;
         }
-        
+
     }
 
 // store s[t-2] and s[t-1] in a static variable
@@ -373,24 +373,24 @@ void find_predict( short *samples, double *d_samples, int *predict_nr, int *shif
 
     _s_1 = s_1;
     _s_2 = s_2;
-    
+
     for ( i = 0; i < 28; i++ )
         d_samples[i] = buffer[i][*predict_nr];
 
 //  if ( min > 32767.0 )
 //      min = 32767.0;
-        
+
     min2 = ( int ) min;
     shift_mask = 0x4000;
     *shift_factor = 0;
-    
+
     while( *shift_factor < 12 ) {
         if ( shift_mask  & ( min2 + ( shift_mask >> 3 ) ) )
             break;
         (*shift_factor)++;
         shift_mask = shift_mask >> 1;
     }
-      
+
 }
 
 void pack( double *d_samples, short *four_bit, int predict_nr, int shift_factor )
@@ -412,7 +412,7 @@ void pack( double *d_samples, short *four_bit, int predict_nr, int shift_factor 
             di = 32767;
         if ( di < -32768 )
             di = -32768;
-            
+
         four_bit[i] = (short) di;
 
         di = di >> shift_factor;
@@ -425,7 +425,7 @@ void pack( double *d_samples, short *four_bit, int predict_nr, int shift_factor 
 void fputi( int d, FILE *fp )
 {
     fputc( d >> 24, fp );
-    fputc( d >> 16, fp );   
+    fputc( d >> 16, fp );
     fputc( d >> 8,  fp );
     fputc( d,       fp );
 }
