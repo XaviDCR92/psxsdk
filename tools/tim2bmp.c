@@ -35,7 +35,7 @@ tim2bmp_info	tim_info;
 
 int mpink_flag = 0;
 
-void rgbpsx_to_rgb24(unsigned short psx_c, unsigned char *r, 
+void rgbpsx_to_rgb24(unsigned short psx_c, unsigned char *r,
 	unsigned char *g, unsigned char *b)
 {
 	*r = (psx_c & 31) << 3;
@@ -56,56 +56,58 @@ int write_bitmap_headers(FILE *f, int w, int h, int bpp)
 	int x;
 	int r;
 	int ret;
-	
+
 	if(bpp == 16)
 		bpp = 24;
-	
+
 	fputc('B', f);
 	fputc('M', f);
-	
+
 	// Calculate and write size of bitmap
-	
+
 	if(bpp == 24)
 		r = w * 3;
 	else if(bpp == 8)
 		r = w;
 	else if(bpp == 4)
 		r = w / 2;
-	
+	else
+		r = 0;
+
 	ret = r;
-	
+
 	if(r & 3)
 	{
 		r|=3;
 		r++;
 	}
-	
+
 	ret = r-ret;
-	
+
 	x=r*h;
 	x+=54;
-	
+
 	if(bpp == 8)
 		x+= 1024;
 	else if(bpp == 4)
 		x+= 64;
-	
+
 	write_le_dword(f, x);
-	
+
 	// Write bfReserved1 and bfReserved2 as zero
 	write_le_dword(f, 0);
-	
+
 	// Calculate and write data offset in file
-	
+
 	x = 54;
-	
+
 	if(bpp == 8)
 		x+= 1024;
 	else if(bpp == 4)
 		x+= 64;
-	
+
 	write_le_dword(f, x);
-	
+
 	write_le_dword(f, 40);
 	write_le_dword(f, w); // Width
 	write_le_dword(f, h); // Height
@@ -117,7 +119,7 @@ int write_bitmap_headers(FILE *f, int w, int h, int bpp)
 	write_le_dword(f, 0);
 	write_le_dword(f, 0);
 	write_le_dword(f,0);
-	
+
 	return ret;
 }
 
@@ -129,9 +131,9 @@ int tim2bmp_read_tim(char *ip, tim2bmp_info *t)
 	//int bl;
 	int x;
 	FILE *i = fopen(ip, "rb");
-	
+
 	fseek(i,0,SEEK_SET);
-	
+
 	if(read_le_dword(i) != 0x10)
 	{
 		fclose(i);
@@ -141,12 +143,12 @@ int tim2bmp_read_tim(char *ip, tim2bmp_info *t)
 	tim_pmode = read_le_dword(i);
 	t->has_clut = (tim_pmode & 8) ? 1 : 0;
 	tim_pmode &= 7;
-	
+
 	if(tim_pmode == 0) t->bpp = 4;
 	else if(tim_pmode == 1) t->bpp = 8;
 	else if(tim_pmode == 2) t->bpp = 16;
 	else if(tim_pmode == 3) t->bpp = 24;
-	
+
 	if(t->has_clut)
 	{
 		t->clut_off = 8;
@@ -155,24 +157,24 @@ int tim2bmp_read_tim(char *ip, tim2bmp_info *t)
 		/* tim_cy = */ read_le_word(i);
 		tim_cw = read_le_word(i);
 		tim_ch = read_le_word(i);
-		
+
 		t->clut = malloc((tim_cw * tim_ch) * sizeof(short));
-		
+
 		for(x = 0; x < (tim_cw * tim_ch); x++)
-			t->clut[x] = read_le_word(i);		
+			t->clut[x] = read_le_word(i);
 	}
-	
+
 	/* bl = */ read_le_dword(i);
-	
+
 	// Read framebuffer X,Y coordinates
-	
-	/* tim_x = */ read_le_word(i); 
+
+	/* tim_x = */ read_le_word(i);
 	/* tim_y = */ read_le_word(i);
-	
+
 	// Read width and height
 	t->w = read_le_word(i); // Fix this for 4bpp and 8bpp images !
 	t->h = read_le_word(i);
-	
+
 	switch(tim_pmode)
 	{
 		case 0: t->real_w = t->w * 4; break;
@@ -181,12 +183,12 @@ int tim2bmp_read_tim(char *ip, tim2bmp_info *t)
 			t->real_w = t->w;
 		break;
 	}
-	
+
 	t->data_off = ftell(i);
 	t->compr = 0;
-	
+
 	fclose(i);
-	
+
 	return 1;
 }
 
@@ -216,12 +218,12 @@ void tim2bmp_convert_image_data(char *ip, char *fp, tim2bmp_info *t)
 	//unsigned char test[17];
 	FILE *i = fopen(ip, "rb");
 	FILE *f = fopen(fp, "wb");
-	
+
 	if(t->compr == 1)
 		gzf = gzopen(ip, "rb");
-	
+
 	write_bitmap_headers(f, t->real_w, t->h, t->bpp);
-	
+
 	if(t->has_clut)
 	{
 		if(t->bpp == 4) // 4bpp
@@ -257,11 +259,11 @@ void tim2bmp_convert_image_data(char *ip, char *fp, tim2bmp_info *t)
 		y = (t->real_w * 24) / 8;
 	else
 		y = (t->real_w * t->bpp) / 8;
-	
+
 //	printf("y = %d\n", y);
 	row_round = y;
 //	printf("row_round = %d\n", y);
-	
+
 	if(row_round & 3)
 	{
 		row_round |= 3;
@@ -271,19 +273,19 @@ void tim2bmp_convert_image_data(char *ip, char *fp, tim2bmp_info *t)
 
 	row_round -= y;
 //	printf("row_round = %d\n", row_round);
-	
+
 	for(y = 0; y < t->h; y++)
 	{
 		tim_row_off = (t->w * 2) * ((t->h - 1)-y);
-		
+
 		if(t->compr == 1)
 			gzseek(gzf, t->data_off + tim_row_off, SEEK_SET);
 		else
 			fseek(i, t->data_off + tim_row_off, SEEK_SET);
-		
+
 		//		printf("ERRNO SHY = %s\n", gzerror(gzf, &x));
 
-		
+
 		for(x = 0; x < t->w; x++)
 		{
 			if(t->compr == 1)
@@ -295,7 +297,7 @@ void tim2bmp_convert_image_data(char *ip, char *fp, tim2bmp_info *t)
 			}
 			else
 				c = read_le_word(i);
-			
+
 			switch(t->bpp)
 			{
 				case 4:
@@ -307,18 +309,18 @@ void tim2bmp_convert_image_data(char *ip, char *fp, tim2bmp_info *t)
 				break;
 				case 16:
 					rgbpsx_to_rgb24(c, &r, &g, &b);
-			
+
 					fputc(b, f);
 					fputc(g, f);
 					fputc(r, f);
 				break;
 			}
 		}
-		
+
 		for(x = 0; x < row_round; x++)
 			fputc(0, f);
 	}
-	
+
 	fclose(i);
 	fclose(f);
 	if(t->compr == 1) gzclose(gzf);
@@ -342,7 +344,7 @@ int main(int argc, char *argv[])
 	int bmp_bpp;*/
 	int r;
 	tim2bmp_info *t = &tim_info;
-	
+
 	if(argc < 2)
 	{
 		printf("tim2bmp - converts a TIM image to a bitmap\n");
@@ -354,14 +356,14 @@ int main(int argc, char *argv[])
 		printf("\n");
 		return -1;
 	}
-	
+
 	/*strm.zalloc = Z_NULL;
 	strm.zfree = Z_NULL;
 	strm.opaque = Z_NULL;
-	
+
 	r = deflateInit(&strm, 1);*/
 	//printf("r = %d, Z_OK = %d\n", r, Z_OK);
-	
+
 	for(x = 3; x < argc; x++)
 	{
 		if(strcmp(argv[x], "-mpink") == 0)
@@ -369,20 +371,20 @@ int main(int argc, char *argv[])
 	}
 
 	i = fopen(argv[1], "rb");
-	
+
 	if(i == NULL)
 	{
 		printf("Couldn't open specified TIM file for reading.\n");
 		return -1;
 	}
-	
+
 	fclose(i);
-	
+
 	r = tim2bmp_read_tim(argv[1], &tim_info);
-	
+
 	if(r != 1)
 		r = tim2bmp_read_pcsx15(argv[1], &tim_info);
-		
+
 	if(argc > 2)
 		tim2bmp_convert_image_data(argv[1], argv[2], t);
 
