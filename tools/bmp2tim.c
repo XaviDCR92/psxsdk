@@ -2,7 +2,7 @@
  * bmp2tim
  *
  * Converts a bitmap to a TIM image
- * 
+ *
  * TEST output in various color depths... and check for issues on big-endian machines
  */
 
@@ -61,7 +61,7 @@ unsigned short read_le_word(FILE *f)
 {
 	unsigned char c;
 	unsigned short i;
-	
+
 	fread(&c, sizeof(char), 1, f);
 	i = c;
 	fread(&c, sizeof(char), 1, f);
@@ -74,7 +74,7 @@ unsigned int read_le_dword(FILE *f)
 {
 	unsigned char c;
 	unsigned int i;
-	
+
 	fread(&c, sizeof(char), 1, f);
 	i = c;
 	fread(&c, sizeof(char), 1, f);
@@ -91,7 +91,7 @@ unsigned int read_le_dword(FILE *f)
 void write_le_word(FILE *f, unsigned short leword)
 {
 	unsigned char c;
-	
+
 	c = leword & 0xff;
 	fwrite(&c, sizeof(char), 1, f);
 	c = leword >> 8;
@@ -102,7 +102,7 @@ void write_le_dword(FILE *f, unsigned int ledword)
 {
 	unsigned char c;
 	int x;
-	
+
 	for(x = 0; x < 4; x++)
 	{
 		c = (ledword >> (x<<3)) & 0xff;
@@ -113,13 +113,13 @@ void write_le_dword(FILE *f, unsigned int ledword)
 PS_BITMAP *ps_create_bitmap(int w, int h, int depth)
 {
 	PS_BITMAP *bm;
-	
+
 	bm = malloc(sizeof(PS_BITMAP));
-	
+
 	bm->w = w;
 	bm->h = h;
 	bm->depth = depth;
-	
+
 	switch(depth)
 	{
 		case 1:
@@ -142,7 +142,7 @@ PS_BITMAP *ps_create_bitmap(int w, int h, int depth)
 			bm->data = malloc((w*h)*4);
 		break;
 	}
-	
+
 	return bm;
 }
 
@@ -163,41 +163,41 @@ PS_BITMAP *ps_load_bitmap(char *filename, PS_RGB *palette)
 	unsigned char *bdata;
 	PS_BITMAP *bm;
 	int x, y, z, i, l;
-	
+
 	bf = fopen(filename, "rb");
-	
+
 	if(bf == NULL)
 		return NULL;
-		
+
 	if(read_le_word(bf) != 19778) // 'BM'
 	{
 		fclose(bf);
 		return NULL;
-	}	
-		
+	}
+
 	/* bsize = */ read_le_dword(bf);
-	
+
 // Read bitmap data offset
 	fseek(bf, 10, SEEK_SET);
 	boff = read_le_dword(bf);
-	
+
 //	printf("BOFF = %d\n", boff);
-	
-// Read information header size, width and height	
+
+// Read information header size, width and height
 
 	bisize = read_le_dword(bf);
-	
 
-	
+
+
 	bwidth = read_le_dword(bf);
 	bheight = read_le_dword(bf);
-	
+
 //	printf("bwidth = %d, bheight = %d\n", bwidth, bheight);
-	
+
 // Read BPP
-	
+
 	fseek(bf, 28, SEEK_SET);
-	
+
 	bbpp = read_le_word(bf);
 
 // Check if there is compression, if there is, abort
@@ -206,15 +206,16 @@ PS_BITMAP *ps_load_bitmap(char *filename, PS_RGB *palette)
 //	printf("BCOMPR = %d\n", bcompr);
 
 	bm = ps_create_bitmap(bwidth, bheight, bbpp);
-		
+
 	if(palette != NULL && bm->depth <= 8)
 	{
 		fseek(bf, 14 + bisize, SEEK_SET);
-		
+
 		if(bm->depth == 4) l = 16;
 		else if(bm->depth == 8) l = 256;
 		else if(bm->depth == 1) l = 2;
-		
+		else l = 0;
+
 		for(x=0;x<l;x++)
 		{
 			palette[x].b = fgetc(bf);
@@ -224,19 +225,19 @@ PS_BITMAP *ps_load_bitmap(char *filename, PS_RGB *palette)
 		}
 	}
 
-// nextvolume FIX 2011-07-08: Now blw (line width with padding) and bwidth 
+// nextvolume FIX 2011-07-08: Now blw (line width with padding) and bwidth
 // (line width without padding)	are calculated in a much cleaner and correct manner.
-	
+
 //	printf("BPP = %d\n", bbpp);
-	
+
 	bwidth = (bwidth * bbpp) >> 3;
 	blw = bwidth;
 	if(blw & 3) blw = (blw & ~3) + 4;
-	
+
 	bdata = (unsigned char*)bm->data;
 
 // Bit mask and colour stuff... Added 2011-07-09
-	
+
 	switch(bisize)
 	{
 		case 40: bm->hdr_type = BITMAPINFOHEADER; break;
@@ -247,11 +248,11 @@ PS_BITMAP *ps_load_bitmap(char *filename, PS_RGB *palette)
 	}
 
 // For now clear Alpha, it will be filled only if it will be found
-	
+
 	bm->mask[3] = 0;
 	bm->shift[3] = 0;
 	bm->bits[3] = 0;
-	
+
 	if(bm->hdr_type == BITMAPINFOHEADER && bbpp == 16)
 	{
 		// Old header type and no bitmasks specified - force defaults
@@ -271,19 +272,19 @@ PS_BITMAP *ps_load_bitmap(char *filename, PS_RGB *palette)
 		fseek(bf, 54, SEEK_SET);
 
 // Calculate rshift and rbits
-		
+
 		if(bm->hdr_type >= BITMAPV3INFOHEADER)
 			l = 4;
 		else
 			l = 3;
-		
+
 		for(i = 0; i < l; i++)
 		{
 			bm->mask[i] = read_le_dword(bf);
 
 			y = 0; // rshift
 			z = 0; // rbits
-		
+
 			for(x = 31; x >= 0; x--)
 			{
 				if(bm->mask[i] & (1<<x))
@@ -292,27 +293,27 @@ PS_BITMAP *ps_load_bitmap(char *filename, PS_RGB *palette)
 					z++;
 				}
 			}
-		
+
 			bm->shift[i] = y;
 			bm->bits[i] = z;
-			
+
 			//printf("shift[%d] = %d, bits[%d] = %d\n", i, bm->shift[i],
 			//	i, bm->bits[i]);
-		}			
+		}
 	}
 
 // Copy data in allocated memory
-	
+
 	for(y = 0; y < bm->h; y++)
 	{
 		fseek(bf, boff + (blw * (bm->h - (1+y))), SEEK_SET);
-	
+
 		for(x = 0; x < bwidth; x++)
 			fread(&bdata[(y*bwidth)+x], sizeof(char), 1, bf);
 	}
-	
+
 	fclose(bf);
-	
+
 	return bm;
 }
 
@@ -352,29 +353,29 @@ unsigned int ps_getpixel(PS_BITMAP *bm, int x, int y)
 	if(bm->depth == 16)
 	{
 		off = ((y*bm->w)+x)*2;
-	
+
 		// Little endian, guys...
-	
+
 		shortbuf = dataptrb[off];
 		shortbuf|= dataptrb[off+1]<<8;
-		
+
 		b = ((shortbuf & bm->mask[2]) >> bm->shift[2]) << (8-bm->bits[2]);
 		g = ((shortbuf & bm->mask[1]) >> bm->shift[1]) << (8-bm->bits[1]);
 		r  = ((shortbuf & bm->mask[0]) >> bm->shift[0]) << (8-bm->bits[0]);
 		a = ((shortbuf & bm->mask[3]) >> bm->shift[3]) << (8-bm->bits[3]);
-	
+
 		return ps_makecol(r, g, b, a);
 	}
 	else if(bm->depth == 24)
 	{
 		// 24-bit bitmaps never have bitmasks.
-		
+
 		off = ((y*bm->w)+x)*3;
 		r = dataptrb[off+2];
 		g = dataptrb[off+1];
 		b = dataptrb[off];
 		a = 255;
-		
+
 		return ps_makecol(r, g, b, 255);
 	}
 	else if(bm->depth == 32)
@@ -387,47 +388,47 @@ unsigned int ps_getpixel(PS_BITMAP *bm, int x, int y)
 		intbuf|= dataptrb[off+1]<<8;
 		intbuf|= dataptrb[off+2]<<16;
 		intbuf|= dataptrb[off+3]<<24;
-		
+
 		r = ((intbuf & bm->mask[0]) >> bm->shift[0]) << (8-bm->bits[0]);
 		g = ((intbuf & bm->mask[1]) >> bm->shift[1]) << (8-bm->bits[1]);
 		b = ((intbuf & bm->mask[2]) >> bm->shift[2]) << (8-bm->bits[2]);
 		a = ((intbuf & bm->mask[3]) >> bm->shift[3]) << (8-bm->bits[3]);
-	
+
 		return ps_makecol(r, g, b, a);
 	}
 	else if(bm->depth == 8)
 	{
 		r = dataptrb[(y*bm->w)+x];
-		
-		return ps_makecol(ps_default_palette[r].r, 
+
+		return ps_makecol(ps_default_palette[r].r,
 			ps_default_palette[r].g, ps_default_palette[r].b, 255);
 	}
 	else if(bm->depth == 4)
 	{
 		off = (y*bm->w)+x;
 		off/= 2;
-		
+
 		if(x & 1)
 			r = dataptrb[off] & 0xf;
 		else
 			r = dataptrb[off] >> 4;
-			
-		return ps_makecol(ps_default_palette[r].r, 
+
+		return ps_makecol(ps_default_palette[r].r,
 			ps_default_palette[r].g, ps_default_palette[r].b, 255);
 	}
 	else if(bm->depth == 1)
 	{
 		off = (y*bm->w)+x;
 		off/= 8;
-		
+
 		r = (dataptrb[off] & (1<<(7-(x&7)))) ? 1 : 0;
-	
+
 		return ps_makecol(ps_default_palette[r].r,
 			ps_default_palette[r].g, ps_default_palette[r].b, 255);
 	}
-	
+
 	return 0;
-}			 
+}
 
 unsigned int ps_getpixel_pal(PS_BITMAP *bm, int x, int y)
 {
@@ -442,7 +443,7 @@ unsigned int ps_getpixel_pal(PS_BITMAP *bm, int x, int y)
 	{
 		off = (y*bm->w)+x;
 		off/= 2;
-		
+
 		if(x & 1)
 			return dataptrb[off] & 0xf;
 		else
@@ -452,17 +453,17 @@ unsigned int ps_getpixel_pal(PS_BITMAP *bm, int x, int y)
 	{
 		off = (y*bm->w)+x;
 		off/= 8;
-		
+
 		return (dataptrb[off] & (1<<(7-(x&7)))) ? 1 : 0;
 	}
-	
+
 	return 0;
 }
 
 void parse_options(int argc, char *argv[])
 {
 	int x;
-	
+
 	for(x=4;x<argc;x++)
 	{
 		if(strncmp("-clut=", argv[x], 6) == 0)
@@ -480,36 +481,36 @@ void parse_options(int argc, char *argv[])
 		else if(strcmp("-raw", argv[x]) == 0)
 			raw_flag = 1;
 	}
-}		
+}
 
 unsigned short rgb24_to_rgbpsx(unsigned char r, unsigned char g, unsigned char b)
 {
 	unsigned short c;
-	
+
 	c = r>>3;
 	c|= (g>>3)<<5;
 	c|= (b>>3)<<10;
-	
+
 	/*if(set_stp_bit) c|=0x8000;*/
 // this code is a bit messy, tidy it up.
-	
+
 	if(c == 0 && !transparent_black)
 		c|=0x8000;
-	
+
 	if(c == ((31)|(31<<10)) && magic_pink)
 		c=0;
-	
+
 	if(set_stp_bit)
 	{
 		if(transparent_black && c == 0)
 			return c;
-		
+
 		if(magic_pink && c == ((31)|(31<<10)))
 			return c;
-		
+
 		c|=0x8000;
 	}
-	
+
 	return c;
 }
 
@@ -548,23 +549,23 @@ int main(int argc, char *argv[])
 		printf("Valid TIM depths are 4 (16-color), 8 (256-color), 16 (RGB555) and 24 (RGB888)\n");
 		return EXIT_SUCCESS;
 	}
-	
+
 	tim_depth = atoi(argv[3]);
-	
+
 	parse_options(argc, argv);
-	
+
 	if(do_clut && tim_depth >= 16)
 	{
 		printf("Images with depths higher than 8-bit can't have a color look up table.\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	if(clut_x & 0xf)
 	{
 		printf("The X position of the CLUT in the framebuffer must be a multiplier of 16.\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	switch(tim_depth)
 	{
 		case 4:
@@ -576,73 +577,73 @@ int main(int argc, char *argv[])
 				cx_out = 1;
 		break;
 	}
-	
+
 	if(cx_out)
 	{
 		printf("X position specified for CLUT out of bounds.\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	if(clut_y >= 512)
 	{
 		printf("Y position specified for CLUT out of bounds.\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	if(do_clut)
 		printf("Generating a Color Look Up Table (CLUT)\n");
-	
+
 	if(tim_depth != 4 && tim_depth != 8 && tim_depth != 16 && tim_depth != 24)
 	{
 		printf("Invalid color depth specified!\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	in_bitmap = ps_load_bitmap(argv[1], in_palette);
-	
+
 	if(in_bitmap == NULL)
 	{
 		printf("Unable to load bitmap. Unsupported format or file is unreadable or does not exist.\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	if(tim_depth == 4 && in_bitmap->depth > 4)
 	{
 		printf("Error: Only a 4-bit bitmap or a bitmap of lower depth can be used to obtain a 4-bit TIM!\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	if(tim_depth == 8 && in_bitmap->depth > 8)
 	{
 		printf("Error: Only a 8-bit or a bitmap of lower depth can be used to obtain a 8-bit TIM!\n");
 		return EXIT_FAILURE;
 	}
-		
+
 /*	allegro_init();
 	set_color_depth(32);
 	install_keyboard();
 	set_gfx_mode(GFX_AUTODETECT_WINDOWED, in_bitmap->w, in_bitmap->h, 0, 0);
-	
+
 	for(y=0;y<in_bitmap->h;y++)
 	{
 		for(x=0;x<in_bitmap->w;x++)
 		{
 			c = ps_getpixel_pal(in_bitmap, x, y);
-			
+
 			//putpixel(screen, x, y, makecol(ps_getr(c), ps_getg(c), ps_getb(c)));
 			putpixel(screen, x, y, makecol(in_palette[c].r, in_palette[c].g,
 			in_palette[c].b));
 		}
 	}
-	
+
 	while(!key[KEY_ESC]);*/
-	
+
 	if(in_bitmap == NULL)
 	{
 		printf("Could not open bitmap. Aborting.\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	switch(tim_depth)
 	{
 		case 4:
@@ -651,7 +652,7 @@ int main(int argc, char *argv[])
 				printf("Error: A 4-bit bitmap must have a width divisible by four.\n");
 				return EXIT_FAILURE;
 			}
-		
+
 			z = in_bitmap->w/4;
 		break;
 		case 8:
@@ -660,7 +661,7 @@ int main(int argc, char *argv[])
 				printf("Error: A 8-bit bitmap must have a width divisible by two.\n");
 				return EXIT_FAILURE;
 			}
-		
+
 			z = in_bitmap->w/2;
 		break;
 		case 16:
@@ -673,7 +674,7 @@ int main(int argc, char *argv[])
 		printf("X position specified for image data out of bounds.\n");
 		return EXIT_FAILURE;
 	}
-	
+
 	switch(tim_depth)
 	{
 		case 4:
@@ -691,29 +692,29 @@ int main(int argc, char *argv[])
 	{
 		printf("Y position specified for image data out of bounds.\n");
 		return EXIT_FAILURE;
-	}	
-	
+	}
+
 	out_tim = fopen(argv[2], "wb");
-	
+
 	if(out_tim == NULL)
 	{
 		printf("Couldn't open file at path %s for writing. Aborting.\n", argv[2]);
 		return EXIT_FAILURE;
 	}
-	
+
 	if(!raw_flag)
 	{
 
 	write_le_dword(out_tim, 0x10); /* ID = 0x10, Version = 0x00 */
-	
-	/* 
+
+	/*
 	 * Now let's fill the TIM flag double word
 	 */
-	
+
 	/*
 	 * Pixel mode (PMODE)
 	 */
-	
+
 	switch(tim_depth)
 	{
 		case 4:
@@ -729,26 +730,26 @@ int main(int argc, char *argv[])
 			tim_flag = 3;
 		break;
 	}
-	
+
 	/*
 	 * Clut flag (CF)
 	 */
 	//tim_flag|=8;
 	if(do_clut)tim_flag|=8;
-	
+
 	write_le_dword(out_tim, tim_flag);
-	
+
 	/*
 	 * If we have to write a CLUT now, we have to write its data block
 	 */
-	
+
 	if(do_clut)
 	{
 		/*
 		 * Let's write the information for the block - we already know
 		 * everything about it.
 		 */
-		 
+
 		switch(tim_depth)
 		{
 			case 4:
@@ -762,11 +763,11 @@ int main(int argc, char *argv[])
 				write_le_dword(out_tim, (1<<16)|256); // Width = 256, Height = 1
 			break;
 		}
-		
+
 		/*
 		 * Let's write the CLUT data
 		 */
-		 
+
 		switch(tim_depth)
 		{
 			case 4:
@@ -774,7 +775,7 @@ int main(int argc, char *argv[])
 				{
 					shortbuf = rgb24_to_rgbpsx(in_palette[x].r, in_palette[x].g,
 						in_palette[x].b);
-						
+
 					write_le_word(out_tim, shortbuf);
 				}
 			break;
@@ -783,17 +784,17 @@ int main(int argc, char *argv[])
 				{
 					shortbuf = rgb24_to_rgbpsx(in_palette[x].r, in_palette[x].g,
 						in_palette[x].b);
-						
+
 					write_le_word(out_tim, shortbuf);
 				}
 			break;
 		}
 	}
-	
+
 	/*
 	 * Write image data block
 	 */
-	 
+
 	switch(tim_depth)
 	{
 		case 4:
@@ -809,10 +810,10 @@ int main(int argc, char *argv[])
 			x = 12 + ((in_bitmap->w * in_bitmap->h) * 3);
 		break;
 	}
-	
+
 	write_le_dword(out_tim, x);
 	write_le_dword(out_tim, (org_y<<16)|org_x);
-	
+
 	switch(tim_depth)
 	{
 		case 4:
@@ -821,7 +822,7 @@ int main(int argc, char *argv[])
 		case 8:
 			write_le_dword(out_tim, (in_bitmap->h<<16)|(in_bitmap->w/2));
 		break;
-		case 16:	
+		case 16:
 			write_le_dword(out_tim, (in_bitmap->h<<16)|in_bitmap->w);
 		break;
 		case 24:
@@ -829,11 +830,11 @@ int main(int argc, char *argv[])
 				(in_bitmap->w/2)));
 		break;
 	}
-	
+
 	}
 
 // Write image pixel data...
-	
+
 	switch(tim_depth)
 	{
 		case 24:
@@ -843,7 +844,7 @@ int main(int argc, char *argv[])
 				{
 					c = ps_getpixel(in_bitmap, x, y);
 					c2 = ps_getpixel(in_bitmap, x+1, y);
-					
+
 					write_le_word(out_tim, (ps_getg(c)<<8)|ps_getr(c));
 					write_le_word(out_tim, (ps_getr(c2)<<8)|ps_getb(c));
 					write_le_word(out_tim, (ps_getb(c2)<<8)|ps_getg(c2));
@@ -869,7 +870,7 @@ int main(int argc, char *argv[])
 					shortbuf = 0;
 					for(c = 0; c < 4; c++)
 						shortbuf |= (ps_getpixel_pal(in_bitmap, x+c, y)&0xf) << (c<<2);
-					
+
 					write_le_word(out_tim, shortbuf);
 				}
 			}
@@ -882,14 +883,14 @@ int main(int argc, char *argv[])
 					shortbuf = 0;
 					for(c = 0; c < 2; c++)
 						shortbuf |= (ps_getpixel_pal(in_bitmap, x+c, y)&0xff) << (c<<3);
-					
+
 					write_le_word(out_tim, shortbuf);
 				}
 			}
 		break;
 	}
-	
+
 	fclose(out_tim);
-	//printf("Bitmap converted to TIM file successfully!\n");	
-	return EXIT_SUCCESS;		
+	//printf("Bitmap converted to TIM file successfully!\n");
+	return EXIT_SUCCESS;
 }
