@@ -817,7 +817,7 @@ int GsSetVideoModeEx(int width, int height, int video_mode, int rgb24,
 			mode|=4;
 		break;
 		default:
-			printf("%s: error, unknown width %d!\n", __FUNCTION__, width);
+			printf("%s: error, unknown height %d!\n", __FUNCTION__, height);
 			return 0;
 	}
 
@@ -834,11 +834,11 @@ int GsSetVideoModeEx(int width, int height, int video_mode, int rgb24,
 		case 640:
 			mode|=3;
 		break;
-		case 384:
+		case 368:
 			mode|=64;
 		break;
 		default:
-			printf("%s: error, unknown height %d!\n", __FUNCTION__, height);
+			printf("%s: error, unknown width %d!\n", __FUNCTION__, width);
 			return 0;
 	}
 
