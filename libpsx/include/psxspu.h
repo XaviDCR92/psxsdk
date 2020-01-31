@@ -45,7 +45,7 @@ typedef struct
 	/** Name */
 	unsigned char name[16];
 	/** Pointer to sound data */
-	void *data;
+	const void *data;
 	/** Address in Sound RAM where the sound data was uploaded */
 	unsigned int spu_addr;
 	/** [Runtime] Voice this VAG is currently being played on */
@@ -113,7 +113,7 @@ void SsKeyOff(int voice);
  * Set the voices specified by the bitmask to 'on'. Like SsKeyOn()
  * @param mask Bitmask
  */
- 
+
 void SsKeyOnMask(int mask);
 
 /**
@@ -142,7 +142,7 @@ void SsInit(void);
  * @param spu_addr Destination address in Sound RAM (multiplier of 8).
  */
 
-void SsUpload(void *addr, int size, int spu_addr);
+void SsUpload(const void *addr, int size, int spu_addr);
 
 /**
  * Converts a sampling rate in hertz to PlayStation pitch rate used by the SPU.
@@ -158,7 +158,7 @@ unsigned short SsFreqToPitch(int hz);
  * @param data Pointer to VAG file data
  */
 
-int SsReadVag(SsVag *vag, void *data);
+int SsReadVag(SsVag *vag, const void *data);
 
 /**
  * Uploads the sound data specified by a SsVag structure to the specified address in Sound RAM.
@@ -186,7 +186,7 @@ void SsUploadVag(SsVag *vag);
  * @param vr Right channel volume
  */
 
-void SsPlayVag(SsVag *vag, unsigned char voice, unsigned short vl, 
+void SsPlayVag(SsVag *vag, unsigned char voice, unsigned short vl,
 	unsigned short vr);
 
 /**

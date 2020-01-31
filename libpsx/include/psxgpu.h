@@ -664,9 +664,9 @@ typedef struct
 	/** Height of image in framebuffer */
 	int h;
 	/** Pointer to CLUT data */
-	void *clut_data;
+	const void *clut_data;
 	/** Pointer to image data */
-	void *data;
+	const void *data;
 }GsImage;
 
 /**
@@ -796,7 +796,7 @@ void MoveImage(int src_x, int src_y, int dst_x, int dst_y, int w, int h);
  * @param h Height of image data
  */
 
-void LoadImage(void *img, int x, int y, int w, int h);
+void LoadImage(const void *img, int x, int y, int w, int h);
 
 /**
  * Draws a rectangle in the framebuffer, without considering drawing
@@ -859,7 +859,7 @@ void gpu_data_ctrl(unsigned int command, unsigned int param);
  * Puts information about a TIM image passed in a buffer in a GsImage structure.
  */
 
-int GsImageFromTim(GsImage *image, void *timdata);
+int GsImageFromTim(GsImage *image, const void *timdata);
 
 /**
  * Uploads an image described by a GsImage structure to video memory.
