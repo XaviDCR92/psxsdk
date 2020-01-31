@@ -1,6 +1,11 @@
 #ifndef _SPU_H
 #define _SPU_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #define SPU_ADDR						*((volatile unsigned short*)0x1f801da6)
 #define SPU_DATA						*((volatile unsigned short*)0x1f801da8)
 #define SPU_CONTROL 					*((volatile unsigned short*)0x1f801daa)
@@ -221,5 +226,9 @@ void SsEnableExt(void);
  */
 
 void SsCdVol(unsigned short left, unsigned short right);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

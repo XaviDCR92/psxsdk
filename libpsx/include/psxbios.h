@@ -5,6 +5,11 @@
 #ifndef _PSXBIOS_H
 #define _PSXBIOS_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /* Joypad functions */
 
 extern void PAD_init(unsigned long mode, unsigned long *pad_buf);
@@ -12,11 +17,11 @@ extern int PAD_dr(void);
 
 /* ROM information functions */
 
-/** 
+/**
  * Returns PSX kernel date.
  * @return Kernel date n 0xYYYYMMDD BCD format.
  */
- 
+
 unsigned long GetKernelDate(void);
 
 /**
@@ -90,7 +95,7 @@ struct DIRENTRY
  * Characters after * are ignored.
  * @param name File name string
  * @param dirent Pointer to a struct DIRENTRY object.
- * @return dirent on success, NULL on failure. 
+ * @return dirent on success, NULL on failure.
  */
 
 struct DIRENTRY *firstfile(const char *name, struct DIRENTRY *dirent);
@@ -106,7 +111,7 @@ struct DIRENTRY *firstfile(const char *name, struct DIRENTRY *dirent);
 
 struct DIRENTRY *nextfile(struct DIRENTRY *dir);
 
-/** 
+/**
  * Gets the file size of the file named "name".
  * It is actually just a wrapper around firstfile.
  * It rounds the file size to the block size (2048).
@@ -122,7 +127,7 @@ int get_file_size(const char *name);
  * @param name File name string
  * @return File size in bytes, unrounded.
  */
- 
+
 int get_real_file_size(const char *name);
 
 void InitHeap(void *block , int size);
@@ -182,7 +187,7 @@ int DisableEvent(unsigned int event);
 
 int DeliverEvent(unsigned int ev1, // Cause descriptor
 			  int ev2); // Event class
-			  
+
 /**
  * Checks if the event specified by its identifier has occured
  * @param event Numerical event identifier
@@ -203,13 +208,17 @@ int WaitEvent(unsigned int event);
  * Replaces the executable image in memory with the one
  * contained in another executable file in PSX-EXE format.
  * WARNING: Does not work right now.
- * 
+ *
  * Most likely you want PSX_RunExe()
  * @param name Path name of PSX-EXE executable
  * @param argc Number of arguments
  * @param argv Pointer to an array of string pointers for each argument
  */
- 
+
 void LoadExec(char *name, int argc, char **argv);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

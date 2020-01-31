@@ -1,4 +1,4 @@
-/* 
+/*
  * strings.h
  *
  * PSXSDK
@@ -6,6 +6,11 @@
 
 #ifndef _STRINGS_H
 #define _STRINGS_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 #include <string.h>
 #include <types.h>
@@ -33,5 +38,9 @@ unsigned int popcount32(uint32_t value);
 unsigned int popcount64(uint64_t value);
 int strcasecmp(const char *s1, const char *s2);
 int strncasecmp(const char *s1, const char *s2, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

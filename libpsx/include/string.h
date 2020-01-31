@@ -12,6 +12,11 @@
 #ifndef _STRING_H
 #define _STRING_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #include <strings.h> // for backwards compatibility
 #include <types.h>
 
@@ -60,5 +65,8 @@ void *memmem(const void *big, size_t big_len, const void *little, size_t little_
 int ffsl(long value);
 int ffsll(long long value);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif

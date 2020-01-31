@@ -9,6 +9,11 @@
 #ifndef _STDLIB_H
 #define _STDLIB_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef unsigned int size_t;
 typedef signed int ssize_t;
 
@@ -61,6 +66,10 @@ void call_atexit_callbacks(void);
 
 #define EXIT_SUCCESS	0
 #define EXIT_FAILURE	1
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

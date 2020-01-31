@@ -1,6 +1,13 @@
 #ifndef _PSXGPU_H
 #define _PSXGPU_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include <stdarg.h>
+
 #define GPU_DATA_PORT_ADDR			0x1f801810
 #define GPU_CONTROL_PORT_ADDR			0x1f801814
 #define GPU_DATA_PORT					*((volatile unsigned int*)GPU_DATA_PORT_ADDR)
@@ -12,8 +19,6 @@
 #define D2_CHCR						*((volatile unsigned int*)0x1f8010a8)
 
 #define get_clutid(cx, cy)			(((cx&0x3ff)>>4)|((cy&0x1ff)<<6))
-
-#include <stdarg.h>
 
 /**
  * Initializes the GPU. Same as GsInitEx(0)
@@ -1138,6 +1143,10 @@ void GsSortPolyLine(GsPolyLine *line);
  */
 
 void GsSortGPolyLine(GsGPolyLine *line);
+
+#ifdef __cplusplus
+}
+#endif
 
 //void GsSortSimpleMap(GsMap *map);
 

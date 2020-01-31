@@ -8,7 +8,7 @@
 #ifdef _PSXSDK_WRAPPER
 
 /*
- * Dirty hack... 
+ * Dirty hack...
  */
 
 #include "/usr/include/stdio.h"
@@ -19,6 +19,11 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 #define SEEK_SET	0
 #define SEEK_CUR	1
@@ -58,7 +63,7 @@ typedef struct
 	 /** Current file position */
 	unsigned int pos;
 	/** File access mode */
-	unsigned int mode; 
+	unsigned int mode;
 	 /** Device ID */
 	unsigned int dev;
 	 /** Size in bytes */
@@ -134,7 +139,7 @@ int remove(const char *filename);
 /**
  * Redirects STDIO to SIO (serial port)
  */
- 
+
 void redirect_stdio_to_sio(void);
 
 /**
@@ -144,21 +149,21 @@ void redirect_stdio_to_sio(void);
  *
  * @param setting New status of the setting (0 = disabled, 1 = enabled)
  */
- 
+
 void sio_stdio_mapcr(unsigned int setting);
 
 /**
  * scanf and friends
  */
- 
+
 int vsscanf(const char *str, const char *fmt, va_list ap);
 int sscanf(const char *str, const char *fmt, ...);
 
 
 /**
- * STDIO for SIO 
+ * STDIO for SIO
  */
- 
+
 int sio_putchar(int c);
 int sio_puts(const char *str);
 int sio_printf(const char *fmt, ...);
@@ -166,5 +171,8 @@ int sio_vprintf(const char *fmt, va_list ap);
 
 #endif
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
