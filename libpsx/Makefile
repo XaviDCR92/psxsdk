@@ -2,10 +2,10 @@
 
 include ../Makefile.cfg
 
-CFLAGS += -O0
+CFLAGS += -Os
 
 # Never remove the line below!
-CFLAGS += -D__IN_LIBPSX
+CFLAGS += -D__IN_LIBPSX -ffunction-sections -fdata-sections
 
 OBJS =	$(patsubst src/%.c, out/%.o, $(wildcard src/*.c)) \
 		$(patsubst src/libc/%.c, out/libc/%.o, $(wildcard src/libc/*.c)) \
