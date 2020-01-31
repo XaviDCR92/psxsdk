@@ -1,4 +1,4 @@
-/* 
+/*
  * exefixup.c v0.02.1 Andrew Kieschnick <andrewk@mail.utexas.edu>
  *                    (v0.02.1): Giuseppe Gatta <tails92@gmail.com>
  *
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 {
   FILE *exe;
   FILE *out;
-  unsigned char data[8];
+  unsigned char data[9];
   char filename[256];
   int i;
   unsigned int header_data[12];
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
       printf("ERROR: Not a PS-X EXE file\n");
       exit(-1);
     }
-  
+
   for(i=0;i<12;i++)
     {
       fscanf(exe, "%c", &data[0]);
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
   printf("s_size\t0x%.8x\n\n", header_data[11]);
 
   fseek(exe, 0, SEEK_END);
-  
+
   size=ftell(exe)-2048;
 
   padsize=2048-(size%2048);
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
       if (yesno=='Y')
 	{
 	  out = fopen(filename, "w");
-	  
+
 	  header_data[5]=size+padsize;
 
 	  fprintf(out, "PS-X EXE");
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 	      int2char(header_data[i], data);
 	      fprintf(out, "%c%c%c%c", data[0], data[1], data[2], data[3]);
 	    }
-	  
+
 	  fseek(exe, 56, SEEK_SET);
 
 	  for(i=0;i<size+1992;i++)
@@ -152,14 +152,14 @@ int main(int argc, char *argv[])
 	    }
 	  for(i=0;i<padsize;i++)
 	    fprintf(out, "%c", 0);
-	  
+
 	  size=header_data[5];
-	  fclose(out);	  
+	  fclose(out);
 	}
     }
-  
+
   yesno='Z';
-  
+
   if (size!=header_data[5])
     {
       printf("WARNING: EXE header t_size does not match filesize-2048\n");
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
       if (yesno=='Y')
 	{
 	  out = fopen(filename, "w");
-	  
+
 	  fprintf(out, "PS-X EXE");
 	  for(i=0;i<5;i++)
 	    {
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
 	      int2char(header_data[i], data);
 	      fprintf(out, "%c%c%c%c", data[0], data[1], data[2], data[3]);
 	    }
-	  
+
 	  fseek(exe, 56, SEEK_SET);
 
 	  for(i=0;i<size+1992;i++)
