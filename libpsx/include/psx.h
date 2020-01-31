@@ -1,11 +1,16 @@
 /*
  * PSXSDK Library include
  */
- 
+
 #ifndef _PSX_H
 #define _PSX_H
 
 #include <stdarg.h>
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 #ifndef true
 #define true 1
@@ -47,7 +52,7 @@
  * + 0.5.99 (0x0599)
  *   - PSXSDK 2015-07-29
  * + 0.6.00 (0x0600)
- *   - PSXSDK 2016-06-03 
+ *   - PSXSDK 2016-06-03
  * + 0.6.1 (0x0601)
  *   - PSXSDK 2018-01-10
  * + 0.6.2 (0x0602)
@@ -101,8 +106,8 @@ extern unsigned char __scratchpad[1024];
 
 enum cop0_register_numbers
 {
-	/** Contains the last invalid program address which caused a trap. 
-	  
+	/** Contains the last invalid program address which caused a trap.
+
 	      It is set by address errors of all kinds. */
 	COP0_BADVADDR = 8,
 	/** CPU mode flags (status register) */
@@ -130,7 +135,7 @@ enum psx_rcnt_specs
 	/** VSync (VBlank) */
 	RCntCNT3		= 0xf2000003,
 };
-	
+
 /**
  * Root counter modes
  */
@@ -156,7 +161,7 @@ struct psx_info
 		int month; // Kernel month
 		int day; // Kernel day
 	}kernel;
-	
+
 	struct system
 	{
 		int memory; // RAM memory size
@@ -209,9 +214,9 @@ void PSX_InitEx(unsigned int flags);
  * This function only supplies basic functionality, adequate for a normal digital pad.
  *
  * If more advanced functionality is desired, use PSX_PollPad() instead of this function.
- * @attention Note that some joypads, like the official ones from Sony, do not like to be polled more than 
+ * @attention Note that some joypads, like the official ones from Sony, do not like to be polled more than
  * once every 1/60th of a second and if this limitation is not considered the data
- * they return is undefined. Other joypads do not have this limitation but in any case err on the safe side. 
+ * they return is undefined. Other joypads do not have this limitation but in any case err on the safe side.
  * @param padbuf Pointer to 16-bit variable where bitmask for pad #1 will be stored.
  *                           If NULL is passed, this argument is ignored.
  * @param padbuf2 Pointer to 16-bit variable where bitmask for pad #2 will be stored
@@ -219,15 +224,18 @@ void PSX_InitEx(unsigned int flags);
  */
 void PSX_ReadPad(unsigned short *padbuf, unsigned short *padbuf2);
 
+void PSX_PollPad_Fast(int pad_num, psx_pad_state *pad_state);
+void PSX_PollPad_Fast_Ex(const unsigned char* const arr, psx_pad_state* const pad_state);
+
 /**
  * Polls a joypad for information.
- * @attention Note that some joypads, like the official ones from Sony, do not like to be polled more than 
+ * @attention Note that some joypads, like the official ones from Sony, do not like to be polled more than
  * once every 1/60th of a second and if this limitation is not considered the data
- * they return is undefined. Other joypads do not have this limitation but in any case err on the safe side. 
+ * they return is undefined. Other joypads do not have this limitation but in any case err on the safe side.
  * @param pad_num Number of the pad to poll (0 = pad #1, 1 = pad #2, etc.)
  * @param pad_state Pointer to a psx_pad_state structure in which to store information for the pad.
  */
- 
+
 void PSX_PollPad(int pad_num, psx_pad_state *pad_state);
 
 /**
@@ -242,7 +250,7 @@ void PSX_GetSysInfo(struct psx_info *info);
  * Gets Coprocessor 0 status register
  * @return Value of Coprocessor 0 status register
  */
- 
+
 unsigned int get_cop0_status(void);
 
 /**
@@ -254,11 +262,11 @@ unsigned int get_cop0_status(void);
 unsigned int set_cop0_status(unsigned int sreg);
 
 /**
- * Gets the contents of the program counter when the 
+ * Gets the contents of the program counter when the
  * last exception happened.
  * @return Value of the program counter at the time of the last exception
  */
- 
+
 unsigned int get_cop0_epc(void);
 
 /**
@@ -279,22 +287,22 @@ void set_cop0_register(unsigned char register_num, unsigned int value);
 
 /**
  * Get value of the specified (data) register of a specified coprocessor
- * @param cop_num Coprocessor number 
+ * @param cop_num Coprocessor number
  * @param register_num Number of coprocessor register whose value must be retrieved
  * @return Value of specified coprocessor register
  */
- 
+
 unsigned int get_cop_register(unsigned char cop_num,
 							unsigned char register_num);
 
 
 /**
  * Get value of the specified control register of a specified coprocessor
- * @param cop_num Coprocessor number 
+ * @param cop_num Coprocessor number
  * @param register_num Number of coprocessor register whose value must be retrieved
  * @return Value of specified coprocessor register
  */
- 
+
 unsigned int get_cop_ctrl_register(unsigned char cop_num,
 							unsigned char register_num);
 
@@ -304,7 +312,7 @@ unsigned int get_cop_ctrl_register(unsigned char cop_num,
  * @param register_num Number of Coprocessor 0 register whose value must be set
  * @param value New value of specified Coprocessor 0 register
  */
- 
+
  void set_cop_register(unsigned char cop_num,
 				unsigned char register_num, unsigned int value);
 
@@ -314,7 +322,7 @@ unsigned int get_cop_ctrl_register(unsigned char cop_num,
  * @param register_num Number of Coprocessor 0 register whose value must be set
  * @param value New value of specified Coprocessor 0 register
  */
- 
+
  void set_cop_ctrl_register(unsigned char cop_num,
 				unsigned char register_num, unsigned int value);
 
@@ -325,7 +333,7 @@ unsigned int get_cop_ctrl_register(unsigned char cop_num,
 
 void run_cop_instruction(unsigned char cop_num,
 						unsigned int operation);
- 
+
 // Root counter functions
 
 /**
@@ -377,7 +385,7 @@ int PSX_RestoreBiosState(void);
  * Gets the bitmask for the flags passed to PSX_InitEx()
  * @return Flag bitmask
  */
- 
+
 unsigned int PSX_GetInitFlags(void);
 
 /**
@@ -385,7 +393,7 @@ unsigned int PSX_GetInitFlags(void);
  * Used for simple, inaccurate timing - the handler function gets called 60 times a second
  * in NTSC video mode and 50 times a second in PAL video mode.
  *
- * While most games use the VBlank interrupt for timing as they don't require high precision and 
+ * While most games use the VBlank interrupt for timing as they don't require high precision and
  * have mechanisms to keep up with the different speed in PAL or NTSC video mode, for precise
  * timing VBlank is inadequate. It is better to look at root counters if you desire precision.
  *
@@ -402,5 +410,9 @@ void SetVBlankHandler(void (*h)());
  */
 
 void RemoveVBlankHandler(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
