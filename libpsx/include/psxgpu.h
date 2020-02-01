@@ -525,7 +525,7 @@ enum psx_gpu_texmodes
 /**
  * Macro to specify texture color mode, takes a value from psx_gpu_texmodes
  */
-#define COLORMODE(x)		x&3
+#define COLORMODE(x)		((x) & 3)
 /**
  * Macro to specify translucency/semitransparency mode, where x can be a value from 0 to 3.
  *
