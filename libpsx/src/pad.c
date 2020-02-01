@@ -48,11 +48,11 @@ int querypad_rxrdy = 1;
 
 void QueryPAD(int pad_n, unsigned char *in, unsigned char *out, int len)
 {
-	int x;
+	volatile int x;
 	volatile int y; // specified as volatile to not make busy loops get optimized out
-	int i;
-	unsigned char TempData;
-	int EmuFlag = 0;
+	volatile int i;
+	volatile unsigned char TempData;
+	volatile int EmuFlag = 0;
 
 	PADSIO_MODE(0) = 0xD;
 	PADSIO_BAUD(0) = 0x88;
