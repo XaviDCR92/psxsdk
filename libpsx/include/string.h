@@ -50,7 +50,7 @@ int strcoll(const char *dst , const char *src);
 char *strerror(int errnum);
 int strerror_r(int errnum, char *strerrbuf, size_t buflen);
 
-void *memset(void *dst , char c , size_t n);
+void *memset(void *dst , int c , size_t n);
 void *memmove(void *dst , const void *src , size_t n);
 int memcmp(const void *b1 , const void *b2 , size_t n);
 void *memchr(void *s , int c , size_t n);
