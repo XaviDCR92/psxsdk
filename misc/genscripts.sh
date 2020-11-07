@@ -50,6 +50,13 @@ SECTIONS
 	.bss  ALIGN(4) :
 	{
 		*(.bss)
+		*(.bss.*)
+		*(.gnu.linkonce.b.*)
+		*(COMMON)
+		*(.sbss)
+		*(.sbss.*)
+		*(.gnu.linkonce.sb.*)
+		*(.scommon)
 	}
 
 	__text_start = ADDR(.text);
