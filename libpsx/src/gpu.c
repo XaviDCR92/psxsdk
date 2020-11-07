@@ -1045,7 +1045,7 @@ void GsSetDispEnvSimple(int x, int y)
 
 void GsLoadFont(int fb_x, int fb_y, int cx, int cy)
 {
-	unsigned short pal[2] = {0x0, 0x7fff};
+	const unsigned short pal[16] = {0x0, 0x7fff};
 
 	LoadImage(psxsdk_font_data, fb_x, fb_y, 16, 128);
 	while(GsIsDrawing());
