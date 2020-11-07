@@ -19,18 +19,26 @@ libpsx.a: $(OBJS)
 	$(AR) r libpsx.a $(OBJS)
 
 out/%.o: src/%.c
+	@mkdir out -p
 	$(CC) $(CFLAGS) -c -o $@ $<
 	
 out/libc/%.o: src/libc/%.c
+	@mkdir out -p
+	@mkdir out/libc -p
 	$(CC) $(CFLAGS) -c -o $@ $<
 	
 out/runexe/%.o: src/runexe/%.c
+	@mkdir out -p
+	@mkdir out/runexe -p
 	$(CC) $(CFLAGS) -c -o $@ $<
 	     
 out/%.o: src/%.s
+	@mkdir out -p
 	$(CC) $(CFLAGS) -c -o $@ $<
 	
 out/runexe/%.o: src/runexe/%.s
+	@mkdir out -p
+	@mkdir out/runexe -p
 	$(CC) $(CFLAGS) -c -o $@ $<
 	
 start.o: src/start/start.s
