@@ -65,4 +65,13 @@ typedef long intptr_t;
 #define PRIuMAX				"llu"
 #define PRIuPTR				"lu"
 
+#define PRIx8 "hhx"
+#define PRIX8 "hhX"
+#define PRIx16 "hx"
+#define PRIX16 "hX"
+#define PRIx32 "x"
+#define PRIX32 "X"
+#define PRIx64 "lx"
+#define PRIX64 "lX"
+
 #endif
