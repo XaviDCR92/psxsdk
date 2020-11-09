@@ -62,7 +62,7 @@ distclean: docs_clean
 	$(MAKE_COMMAND) -C tools distclean
 	$(MAKE_COMMAND) -C examples distclean
 	$(CLEAN_CXX)
-	
+
 build_examples:
 	$(MAKE_COMMAND) -C examples
 

@@ -1,6 +1,6 @@
 /*
  * string.c
- * 
+ *
  * Part of the PSXSDK C library
  */
 
@@ -21,17 +21,17 @@ void *memcpy(void *dst, const void *src, size_t len)
 }
 
 void *memccpy(void *dst, const void *src, int c, size_t len)
-{	
+{
 	unsigned char c2;
-	
+
 	while(len--)
 	{
 		*(((unsigned char*)dst++)) = ( c2 = *(((unsigned char*)src++)) );
-		
+
 		if(c2 == c)
 			return (void*)src;
 	}
-	
+
 	return NULL;
 }
 
@@ -42,7 +42,7 @@ void *memset(void *dst , char c , size_t n)
 
 	for(x = 0; x < n; x++)
 		dstc[x] = c;
-	
+
 	return dst;
 }
 
@@ -51,24 +51,24 @@ int memcmp(const void *b1, const void *b2, size_t n)
 	int x;
 	unsigned char *bp1 = (unsigned char*)b1;
 	unsigned char *bp2 = (unsigned char*)b2;
-	
+
 	for(x = 0;  x < n; x++)
 		if(bp1[x] != bp2[x])
 			return (bp1[x] - bp2[x]);
-		
+
 	return 0;
 }
 
 void *memmove(void *dst, const void *src, size_t len)
 {
 	void *dst2 = dst;
-	
+
 	dst+=len-1;
 	src+=len-1;
-	
+
 	while(len--)
 		*(((unsigned char*)dst--)) = *(((unsigned char*)src--));
-		
+
 	return dst2;
 }
 
@@ -78,10 +78,10 @@ void *memchr(void *s , int c , size_t n)
 	{
 		if(*((unsigned char*)s) == (unsigned char)c)
 			return s;
-		
+
 		s++;
 	}
-	
+
 	return NULL;
 }
 
@@ -94,9 +94,9 @@ char *strncpy(char *dst, const char *src, size_t len)
 		*(dst++) = *(src++);
 		len--;
 	}
-	
+
 	if(len)*dst = 0;
-	
+
 	return odst;
 }
 
@@ -156,7 +156,7 @@ char *strstr(const char *big, const char *little)
 
 	if(ls == 0)
 		return (char*)big;
-	
+
 	if(ls > bs)
 		return NULL;
 
@@ -207,7 +207,7 @@ char *strdup(const char *str)
 
 	if(ns == NULL)
 		return NULL;
-	
+
 	strcpy(ns, str);
 	return ns;
 }
@@ -219,20 +219,20 @@ char *strndup(const char *str, size_t len)
 
 	if(ns == NULL)
 		return NULL;
-	
+
 	strncpy(ns, str, (n+1)>len?len:(n+1));
 	return ns;
 }
-	
+
 long long strtoll(const char *nptr, char **endptr, int base)
 {
 	int r = 0;
 	int t = 0;
 	int n = 0;
-	
+
 	while(*nptr && isspace(*nptr))
 		nptr++;
-	
+
 	if(*nptr == '-')
 	{
 		nptr++;
@@ -321,7 +321,7 @@ double strtod(const char *nptr, char **endptr)
 			strbuf[x++] = *(nptr++);
 
 		strbuf[x] = 0;
-		
+
 		if(endptr != NULL) *endptr = (char*)nptr;
 
 		y=1;
@@ -337,7 +337,7 @@ double strtod(const char *nptr, char **endptr)
 		if(endptr != NULL)
 			*endptr = (char*)nptr;
 	}
-	
+
 	return (i + d)*s;
 }
 
@@ -412,11 +412,11 @@ char *strsep(char **stringp, const char *delim)
 	char *old = *stringp;
 	const char *s;
 	int ok = 0;
-		
+
 	while(**stringp && !ok)
 	{
 		s = delim;
-		
+
 		while(*delim)
 		{
 			if(**stringp == *delim)
@@ -425,17 +425,17 @@ char *strsep(char **stringp, const char *delim)
 				ok = 1;
 				break;
 			}
-			
+
 			delim++;
 		}
-		
+
 		delim = s;
-		
+
 		*stringp+=1;
 	}
-	
+
 	if(!ok)*stringp = NULL;
-	
+
 	return old;
 }
 
@@ -446,12 +446,12 @@ char *strtok(char *str, const char *sep)
 	static int strtok_len;
 	static int strtok_pos;
 	//int strtok_oldpos = 0;
-	
+
 	if(str != NULL)
 	{
 		strtok_string = str;
 		strtok_len = strlen(str);
-		
+
 		for(x = 0; x < strtok_len; x++)
 		{
 			for(y = 0; sep[y] != 0; y++)
@@ -463,18 +463,18 @@ char *strtok(char *str, const char *sep)
 				}
 			}
 		}
-		
+
 		strtok_pos = 0;
-		
+
 		while(strtok_pos < strtok_len)
 		{
 			if(strtok_string[strtok_pos])
 				return &strtok_string[strtok_pos];
-		
+
 			strtok_pos++;
 		}
 	}
-	
+
 	while(strtok_pos < strtok_len)
 	{
 		if(!strtok_string[strtok_pos])
@@ -482,19 +482,19 @@ char *strtok(char *str, const char *sep)
 			strtok_pos++;
 			break;
 		}
-		
+
 		strtok_pos++;
 	}
-	
+
 	while(strtok_pos < strtok_len)
 	{
 
 		if(strtok_string[strtok_pos])
 			return &strtok_string[strtok_pos];
-		
+
 		strtok_pos++;
 	}
-		
+
 	return NULL;
 }
 
@@ -502,11 +502,11 @@ int strspn(const char *s, const char *charset)
 {
 	int x, y;
 	int appears;
-	
+
 	for(x = 0; s[x] != 0; x++)
-	{		
+	{
 		appears = 0;
-		
+
 		for(y = 0; charset[y] != 0; y++)
 		{
 			if(s[x] == charset[y])
@@ -515,10 +515,10 @@ int strspn(const char *s, const char *charset)
 				break;
 			}
 		}
-		
+
 		if(!appears)break;
 	}
-	
+
 	return x;
 }
 
@@ -526,11 +526,11 @@ int strcspn(const char *s, const char *charset)
 {
 	int x, y;
 	int appears;
-	
+
 	for(x = 0; s[x] != 0; x++)
-	{		
+	{
 		appears = 0;
-		
+
 		for(y = 0; charset[y] != 0; y++)
 		{
 			if(s[x] == charset[y])
@@ -539,36 +539,36 @@ int strcspn(const char *s, const char *charset)
 				break;
 			}
 		}
-		
+
 		if(appears)break;
 	}
-	
+
 	return x;
 }
 
 char *strlwr(char *string)
 {
 	char *old = string;
-	
+
 	while(*string)
 	{
 		*string = tolower(*string);
 		string++;
 	}
-	
+
 	return old;
 }
 
 char *strupr(char *string)
 {
 	char *old = string;
-	
+
 	while(*string)
 	{
 		*string = toupper(*string);
 		string++;
 	}
-	
+
 	return old;
 }
 
@@ -585,10 +585,10 @@ long atol(const char *string)
 int strnlen(const char *s, size_t maxlen)
 {
 	int l=0;
-	
+
 	while(*(s++) && l<maxlen)
 		l++;
-	
+
 	return l;
 }
 
@@ -596,9 +596,9 @@ void *memrchr(void *b, int c, size_t len)
 {
 	int i = len - 1;
 	unsigned char *p = b;
-	
+
 	for(i = len - 1; p[i] != (unsigned char)c && i >= 0;i--);
-	
+
 	return (i>=0)?&p[i]:NULL;
 }
 
@@ -608,22 +608,22 @@ char *stpcpy(char *dst, const char *src)
 	{
 		*(dst++) = *src;
 	}while(*(src++));
-	
+
 	return dst-1;
 }
 
 char *stpncpy(char *dst, const char *src, int len)
 {
 	int c = 0;
-	
+
 	do
 	{
 		if(c < len)
 			*(dst++) = *src;
-		
+
 		c++;
 	}while(*(src++) && c < len);
-	
+
 	return dst-1;
 }
 
@@ -634,7 +634,7 @@ char *strcasestr(const char *big, const char *little)
 		const char *pbig = big;
 		const char *plittle = little;
 		int ok = 1;
-		
+
 		while(*pbig)
 		{
 			if(tolower(*pbig) != tolower(*plittle))
@@ -642,29 +642,29 @@ char *strcasestr(const char *big, const char *little)
 				ok = 0;
 				break;
 			}
-			
+
 			pbig++;
 			plittle++;
 		}
-		
+
 		if(ok)
 			return (char*)big;
-		
+
 		big++;
 	}
-	
+
 	return NULL;
 }
 
 int strlcpy(char *dst, const char *src, size_t size)
 {
 	char *src_end = memchr((void*)src, '\0', size);
-	
+
 	if(src_end == NULL)
 		return 0;
 
 	memcpy(dst, src, src_end - src);
-	
+
 	return (src_end - src);
 }
 
@@ -673,13 +673,13 @@ int strlcat(char *dst, const char *src, size_t size)
 	int dstl = strlen(dst);
 	char *q = dst + dstl;
 	int real_size = size;
-	
+
 	if(memchr((void*)src, '\0', size))
 		real_size = strlen(src);
-	
+
 	memcpy(q, src, real_size-dstl-1);
 	if(real_size != size) q[real_size-dstl-1] = '\0';
-	
+
 	return size-dstl;
 }
 
@@ -689,7 +689,7 @@ void *memmem(const void *big, size_t big_len, const void *little,
 	int i, j, l;
 	unsigned char *bigp = (unsigned char*)big;
 	unsigned char *littlep = (unsigned char*)little;
-	
+
 	for(i = 0, l = (int)(big_len - little_len); i <= l; i++, bigp++)
 	{
 		for(j = 0; j < little_len; j++)
@@ -697,10 +697,10 @@ void *memmem(const void *big, size_t big_len, const void *little,
 			if(littlep[j] != bigp[j])
 				break;
 		}
-		
+
 		if(j == little_len)
 			return bigp;
 	}
-	
+
 	return NULL;
 }
