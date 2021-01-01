@@ -11,12 +11,12 @@
 extern int __bss_start[];
 extern int __bss_end[];
 
-unsigned int first_free_page;
+static unsigned int first_free_page;
 
 // 1K granularity and "pages", so more allocations which are small can be done
 
-unsigned char busy_pages[2048];
-unsigned int  alloc_size[2048];
+static unsigned char busy_pages[2048];
+static unsigned int  alloc_size[2048];
 
 // RAM memory map on the PSX
 // 0x80000000 - 0x8000FFFF		RAM used by the BIOS
