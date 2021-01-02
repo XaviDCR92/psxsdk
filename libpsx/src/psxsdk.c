@@ -141,6 +141,27 @@ void PSX_ReadPad(unsigned short *padbuf, unsigned short *padbuf2)
 
 unsigned char psxsdkPadArr[PAD_READ_RAW_SIZE][2];
 
+void PSX_ReadMouse(unsigned short* dig_pad1, unsigned short* adc_pad1)
+{
+    unsigned char* arr = psxsdkPadArr[0];
+
+    const unsigned char pad_cmd[PAD_READ_RAW_SIZE] = {1,0x42,0,0,0,0,0}; // 2 extra bytes than digital pad
+
+    QueryPAD(0, pad_cmd, arr, sizeof(pad_cmd));
+
+    if(arr[2] == 0x5A)
+    {
+        *dig_pad1 = (arr[3]<<8)|arr[4];
+        *dig_pad1 = ~*dig_pad1;
+        *adc_pad1 = (arr[5]<<8)|arr[6];
+    }
+    else
+    {
+        *dig_pad1 = 0;
+        *adc_pad1 = 0;
+    }
+}
+
 void PSX_PollPad_Fast_Ex(const unsigned char* const arr, psx_pad_state* const pad_state)
 {
     //Rely on pad_read_raw being called AFTER PSX_ReadPad(),
