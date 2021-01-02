@@ -4,7 +4,7 @@
 
 // The font was created by John Reeves Hall
 
-unsigned char psxsdk_font_data[] =
+const unsigned char psxsdk_font_data[] =
 {
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 

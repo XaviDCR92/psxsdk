@@ -46,7 +46,7 @@
 unsigned char readpad_vibrations[4][2];
 int querypad_rxrdy = 1;
 
-void QueryPAD(int pad_n, unsigned char *in, unsigned char *out, int len)
+void QueryPAD(int pad_n, const unsigned char *in, unsigned char *out, int len)
 {
 	volatile int x;
 	volatile int y; // specified as volatile to not make busy loops get optimized out
@@ -160,4 +160,3 @@ void pad_set_analog(int pad_n, int lock)
 	QueryPAD(pad_n, pad_cmd2, NULL, sizeof(pad_cmd));
 	pad_escape_mode(pad_n, 0);
 }*/
-

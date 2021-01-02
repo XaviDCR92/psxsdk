@@ -176,7 +176,7 @@ typedef struct
 	}extra;
 }psx_pad_state;
 
-void QueryPAD(int pad_n, unsigned char *in, unsigned char *out, int len);
+void QueryPAD(int pad_n, const unsigned char *in, unsigned char *out, int len);
 void pad_read_raw(int pad_n, unsigned char *arr);
 void pad_escape_mode(int pad_n, int enable);
 void pad_enable_vibration(int pad_n);

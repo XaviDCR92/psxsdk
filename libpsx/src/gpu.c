@@ -158,7 +158,7 @@ void GsDrawListPIO()
 		while(GsIsDrawing());
 }
 
-void GsSortPoly3(GsPoly3 *poly3)
+void GsSortPoly3(const GsPoly3 *poly3)
 {
 	int orig_pos = linked_list_pos;
 	int x;
@@ -177,7 +177,7 @@ void GsSortPoly3(GsPoly3 *poly3)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortPoly4(GsPoly4 *poly4)
+void GsSortPoly4(const GsPoly4 *poly4)
 {
 	int orig_pos = linked_list_pos;
 	int x;
@@ -196,7 +196,7 @@ void GsSortPoly4(GsPoly4 *poly4)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortGPoly3(GsGPoly3 *poly3)
+void GsSortGPoly3(const GsGPoly3 *poly3)
 {
 	// PKT 0x30
 
@@ -219,7 +219,7 @@ void GsSortGPoly3(GsGPoly3 *poly3)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortGPoly4(GsGPoly4 *poly4)
+void GsSortGPoly4(const GsGPoly4 *poly4)
 {
 	// PKT 0x38
 
@@ -242,7 +242,7 @@ void GsSortGPoly4(GsGPoly4 *poly4)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortLine(GsLine *line)
+void GsSortLine(const GsLine *line)
 {
 	// PKT 0x40
 
@@ -263,7 +263,7 @@ void GsSortLine(GsLine *line)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortGLine(GsGLine *line)
+void GsSortGLine(const GsGLine *line)
 {
 	// PKT 0x50
 
@@ -286,7 +286,7 @@ void GsSortGLine(GsGLine *line)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortDot(GsDot *dot)
+void GsSortDot(const GsDot *dot)
 {
 	// PKT 0x68
 
@@ -304,7 +304,7 @@ void GsSortDot(GsDot *dot)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortSprite(GsSprite *sprite)
+void GsSortSprite(const GsSprite *sprite)
 {
 	GsTPoly4 tpoly4;
 	int x, y;
@@ -447,7 +447,7 @@ void GsSortSprite(GsSprite *sprite)
 	}
 }
 
-void GsSortSimpleSprite(GsSprite *sprite)
+void GsSortSimpleSprite(const GsSprite *sprite)
 {
 	unsigned int orig_pos = linked_list_pos;
 	unsigned char pkt = 0x64;
@@ -465,7 +465,7 @@ void GsSortSimpleSprite(GsSprite *sprite)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortRectangle(GsRectangle *rectangle)
+void GsSortRectangle(const GsRectangle *rectangle)
 {
 	unsigned int orig_pos = linked_list_pos;
 	unsigned char pkt = 0x60;
@@ -482,7 +482,7 @@ void GsSortRectangle(GsRectangle *rectangle)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortTPoly4(GsTPoly4 *tpoly4)
+void GsSortTPoly4(const GsTPoly4 *tpoly4)
 {
 	unsigned int orig_pos = linked_list_pos;
 	unsigned char pkt = 0x2c;
@@ -515,7 +515,7 @@ void GsSortTPoly4(GsTPoly4 *tpoly4)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortTPoly3(GsTPoly3 *tpoly3)
+void GsSortTPoly3(const GsTPoly3 *tpoly3)
 {
 	int orig_pos = linked_list_pos;
 	int x;
@@ -604,6 +604,12 @@ void LoadImage(const void *img, int x, int y, int w, int h)
 //	while(!(GPU_CONTROL_PORT & (1<<0x1c)));
 }
 
+void GsUploadCLUT(const GsImage * image)
+{
+    LoadImage(  image->clut_data, image->clut_x, image->clut_y,
+                image->clut_w, image->clut_h    );
+}
+
 /*void LoadImage(void *img, int x, int y, int w, int h)
 {
 	GPU_dw(x, y, w, h, img);
@@ -628,7 +634,7 @@ void LoadImage(const void *img, int x, int y, int w, int h)
 	while(D2_CHCR & (1<<0x18));
 //}*/
 
-void GsSetDrawEnv(GsDrawEnv *drawenv)
+void GsSetDrawEnv(const GsDrawEnv *drawenv)
 {
 	int end_y, end_x;
 	int mf;
@@ -665,7 +671,25 @@ void GsSetDrawEnv(GsDrawEnv *drawenv)
 	GsCurDrawEnvH = drawenv->h;
 }
 
-void GsSetDispEnv(GsDispEnv *dispenv)
+void GsSetDrawEnv_DMA(const GsDrawEnv* drawenv)
+{
+    unsigned int orig_pos = linked_list_pos;
+
+    linked_list[linked_list_pos++] = 0x05000000;
+
+    linked_list[linked_list_pos++] = (0xE1 << 24) |(drawenv->draw_on_display>=1)<<10|(drawenv->dither>=1)<<9;
+    linked_list[linked_list_pos++] = (0xE2 << 24);
+    linked_list[linked_list_pos++] = ((0xE3 << 24) | (drawenv->x & 0x7FF) | ((drawenv->y & 0x3FF) << 10));
+    linked_list[linked_list_pos++] = ((0xE4 << 24) | ((drawenv->x + drawenv->w - 1) & 0x3FF) | (((drawenv->y + drawenv->h - 1) & 0x3FF) << 10));
+    linked_list[linked_list_pos++] = ((0xE5 << 24) | ((drawenv->x) & 0x7FF) | (((drawenv->y ) & 0x7FF) << 11));
+
+    linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
+
+    GsCurDrawEnvW = drawenv->w;
+    GsCurDrawEnvH = drawenv->h;
+}
+
+void GsSetDispEnv(const GsDispEnv *dispenv)
 {
 	gpu_ctrl(5, (dispenv->y<<10)|dispenv->x); // Display offset
 }
@@ -938,7 +962,7 @@ int GsImageFromTim(GsImage *image, const void *timdata)
 	return 1;
 }
 
-void GsUploadImage(GsImage *image)
+void GsUploadImage(const GsImage *image)
 {
 	if(image->has_clut)
 		LoadImage(image->clut_data, image->clut_x, image->clut_y,
@@ -947,7 +971,7 @@ void GsUploadImage(GsImage *image)
 	LoadImage(image->data, image->x, image->y, image->w, image->h);
 }
 
-int GsSpriteFromImage(GsSprite *sprite, GsImage *image, int do_upload)
+int GsSpriteFromImage(GsSprite *sprite, const GsImage *image, int do_upload)
 {
 	if(do_upload)
 		GsUploadImage(image);
@@ -1386,7 +1410,7 @@ void GsSetListEx(unsigned int *listptr, unsigned int listpos)
 	linked_list_pos = listpos;
 }
 
-void GsSortPolyLine(GsPolyLine *line)
+void GsSortPolyLine(const GsPolyLine *line)
 {
 	// PKT 0x48
 
@@ -1409,7 +1433,7 @@ void GsSortPolyLine(GsPolyLine *line)
 	linked_list[orig_pos] = ((line->npoints+3) << 24) | (((unsigned int)&linked_list[linked_list_pos]) & 0xffffff);
 }
 
-void GsSortGPolyLine(GsGPolyLine *line)
+void GsSortGPolyLine(const GsGPolyLine *line)
 {
 	// PKT 0x58
 
@@ -1434,7 +1458,7 @@ void GsSortGPolyLine(GsGPolyLine *line)
 	linked_list[orig_pos] = (((line->npoints*2)+2) << 24) | (((unsigned int)&linked_list[linked_list_pos]) & 0xffffff);
 }
 
-void GsSortGTPoly4(GsGTPoly4 *tpoly4)
+void GsSortGTPoly4(const GsGTPoly4 *tpoly4)
 {
 	unsigned int orig_pos = linked_list_pos;
 	unsigned char pkt = 0x3c;
@@ -1470,7 +1494,7 @@ void GsSortGTPoly4(GsGTPoly4 *tpoly4)
 	linked_list[orig_pos] |= ((unsigned int)&linked_list[linked_list_pos]) & 0xffffff;
 }
 
-void GsSortGTPoly3(GsGTPoly3 *tpoly3)
+void GsSortGTPoly3(const GsGTPoly3 *tpoly3)
 {
 	int orig_pos = linked_list_pos;
 	int x;

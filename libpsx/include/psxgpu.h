@@ -679,84 +679,84 @@ typedef struct
  * @param poly3 Pointer to structure for monochrome 3 point polygon
  */
 
-void GsSortPoly3(GsPoly3 *poly3);
+void GsSortPoly3(const GsPoly3 *poly3);
 
 /**
  * Adds a monochrome 4 point polygon to the packet list
  * @param poly4 Pointer to structure for monochrome 4 point polygon
  */
 
-void GsSortPoly4(GsPoly4 *poly4);
+void GsSortPoly4(const GsPoly4 *poly4);
 
 /**
  * Adds a textured 3 point polygon to the packet list
  * @param tpoly3 Pointer to structure for textured 3 point polygon
  */
 
-void GsSortTPoly3(GsTPoly3 *tpoly3);
+void GsSortTPoly3(const GsTPoly3 *tpoly3);
 
 /**
  * Adds a textured 4 point polygon to the packet list
  * @param tpoly4 Pointer to structure for textured 4 point polygon
  */
 
-void GsSortTPoly4(GsTPoly4 *tpoly4);
+void GsSortTPoly4(const GsTPoly4 *tpoly4);
 
 /**
  * Adds a gradated 3 point polygon to the packet list
  * @param poly3 Pointer to structure for gradated 3 point polygon
  */
 
-void GsSortGPoly3(GsGPoly3 *poly3);
+void GsSortGPoly3(const GsGPoly3 *poly3);
 
 /**
  * Adds a gradated 4 point polygon to the packet list
  * @param poly4 Pointer to structure for gradated 4 point polygon
  */
 
-void GsSortGPoly4(GsGPoly4 *poly4);
+void GsSortGPoly4(const GsGPoly4 *poly4);
 
 /**
  * Adds a gradated textured 3 point polygon to the packet list
  * @param tpoly3 Pointer to structure for textured 3 point polygon
  */
 
-void GsSortGTPoly3(GsGTPoly3 *tpoly3);
+void GsSortGTPoly3(const GsGTPoly3 *tpoly3);
 
 /**
  * Adds a gradated 4 point polygon to the packet list
  * @param tpoly4 Pointer to structure for textured 4 point polygon
  */
 
-void GsSortGTPoly4(GsGTPoly4 *tpoly4);
+void GsSortGTPoly4(const GsGTPoly4 *tpoly4);
 
 /**
  * Adds a monochrome line to the packet list
  * @param line Pointer to structure for monochrome line
  */
 
-void GsSortLine(GsLine *line);
+void GsSortLine(const GsLine *line);
 
 /**
  * Adds a gradated line to the packet list
  * @param line Pointer to structure for gradated line
  */
 
-void GsSortGLine(GsGLine *line);
+void GsSortGLine(const GsGLine *line);
 
 /**
  * Adds a dot (pixel) to the packet list
  * @param dot Pointer to structure for dot
  */
 
-void GsSortDot(GsDot *dot);
+void GsSortDot(const GsDot *dot);
 
 /**
  * Adds a sprite to the packet list
  * @param sprite Pointer to structure for sprite
  */
 
-void GsSortSprite(GsSprite *sprite);
+void GsSortSprite(const GsSprite *sprite);
 
 /**
  * Always adds a REAL sprite to the packet list
@@ -770,14 +770,14 @@ void GsSortSprite(GsSprite *sprite);
  * @param sprite Pointer to structure for sprite
  */
 
-void GsSortSimpleSprite(GsSprite *sprite);
+void GsSortSimpleSprite(const GsSprite *sprite);
 
 /**
  * Adds a rectangle to the packet list
  * @param rectangle Pointer to structure for rectangle
  */
 
-void GsSortRectangle(GsRectangle *rectangle);
+void GsSortRectangle(const GsRectangle *rectangle);
 
 /**
  * Moves image data from a part of the framebuffer to another.
@@ -822,14 +822,20 @@ void DrawFBRect(int x, int y, int w, int h, int r, int g, int b);
  * @param drawenv Pointer to drawing environment structure
  */
 
-void GsSetDrawEnv(GsDrawEnv *drawenv);
+void GsSetDrawEnv(const GsDrawEnv *drawenv);
+
+/**
+ * Set drawing environment via DMA commands.
+ * @param drawenv Pointer to drawing environment structure
+ */
+void GsSetDrawEnv_DMA(const GsDrawEnv* drawenv);
 
 /**
  * Set display environment
  * @param dispenv Pointer to display environment structure
  */
 
-void GsSetDispEnv(GsDispEnv *dispenv);
+void GsSetDispEnv(const GsDispEnv *dispenv);
 
 
 
@@ -870,7 +876,12 @@ int GsImageFromTim(GsImage *image, const void *timdata);
  * Uploads an image described by a GsImage structure to video memory.
  */
 
-void GsUploadImage(GsImage *image);
+void GsUploadImage(const GsImage *image);
+
+/**
+ * Upload a CLUT described by a GsImage structure to video memory.
+ */
+void GsUploadCLUT(const GsImage *image);
 
 /**
  * Fills a GsSprite structure with information from an image described
@@ -878,7 +889,7 @@ void GsUploadImage(GsImage *image);
  * Sprite coordinates are set to 0.
  */
 
-int GsSpriteFromImage(GsSprite *sprite, GsImage *image, int do_upload);
+int GsSpriteFromImage(GsSprite *sprite, const GsImage *image, int do_upload);
 
 /**
  * Checks if the GPU is drawing
@@ -1135,14 +1146,14 @@ void GsRotateVector(int x_a, int y_a, int z_a, double *v, double *n);
  * @param line Pointer to structure for monochrome polyline
  */
 
-void GsSortPolyLine(GsPolyLine *line);
+void GsSortPolyLine(const GsPolyLine *line);
 
 /**
  * Adds a gradated polyline to the packet list
  * @param line Pointer to structure for monochrome line
  */
 
-void GsSortGPolyLine(GsGPolyLine *line);
+void GsSortGPolyLine(const GsGPolyLine *line);
 
 #ifdef __cplusplus
 }
