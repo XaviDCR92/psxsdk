@@ -4,6 +4,8 @@
 /*Card connection related*/
 enum memcard_status
 {
+	/** Memory card state unknown */
+	MEMCARD_STATUS_UNKNOWN = 0,
 	/** Memory card is connected */
 	MEMCARD_CONNECTED = 1,
 	/** Memory card is formatted */
