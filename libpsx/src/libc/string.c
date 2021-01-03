@@ -35,12 +35,12 @@ void *memccpy(void *dst, const void *src, int c, size_t len)
 	return NULL;
 }
 
-void *memset(void *dst , char c , size_t n)
+void *memset(void *dst , int c , size_t len)
 {
 	unsigned char *dstc = (unsigned char*)dst;
 	int x;
 
-	for(x = 0; x < n; x++)
+	for(x = 0; x < len; x++)
 		dstc[x] = c;
 
 	return dst;
