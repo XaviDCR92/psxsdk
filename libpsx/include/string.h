@@ -37,6 +37,7 @@ int strspn(const char *s , const char *charset);
 int strcspn(const char *s , const char *charset);
 char *strsep(char **stringp, const char *delim);
 char *strtok(char *str, const char *sep);
+char* strtok_r(char *str, const char *delim, char **nextp);
 char *strstr(const char *big , const char *little);
 char *strcasestr(const char *big, const char *little);
 char *strlwr(char *string);
